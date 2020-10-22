@@ -1,18 +1,17 @@
 package com.library.services.impl;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.*;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 
+import com.itextpdf.text.*;
 import com.library.services.ProduitService;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
@@ -27,13 +26,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.Element;
-import com.itextpdf.text.Font;
-import com.itextpdf.text.FontFactory;
-import com.itextpdf.text.PageSize;
-import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
@@ -50,9 +42,12 @@ public class ProduitServiceImpl implements ProduitService {
 	
 	@Autowired
 	private ProduitRepository produitRepository;
-	
+
+	/*
 	@Autowired
 	private CategoryRepository categoryRepository;
+
+	*/
 
 	@Override
 	public List<Produit> findAllProduits() {
@@ -96,7 +91,12 @@ public class ProduitServiceImpl implements ProduitService {
 	public List<Produit> findProductByScateoryId(Long scatId) {
 		return produitRepository.findProductByScateoryId(scatId);
 	}
-	
+
+	@Override
+	public List<Produit> findListProduitByAddDate(Date add_date) {
+		return produitRepository.findByAdd_date(add_date);
+	}
+
 	@Override
 	public Page<Produit> findAllProduitsByPageable(Pageable page) {
 		return produitRepository.findAllProduitsByPageable(page);
@@ -112,6 +112,7 @@ public class ProduitServiceImpl implements ProduitService {
 		return produitRepository.findProduitByKeyWord(mc, pageable);
 	}
 
+	/*
 	@Override
 	public Produit saveProduit(Long catId, Produit produit) {
 		Set<Produit> products = new HashSet<Produit>(); 
@@ -131,6 +132,8 @@ public class ProduitServiceImpl implements ProduitService {
 	  
 		return prod;
 	}
+
+	*/
 
 	@Override
 	public Produit saveProduit(Produit produit) {
@@ -206,7 +209,7 @@ public class ProduitServiceImpl implements ProduitService {
 			paragraph.setSpacingAfter(10);
 			document.add(paragraph);
 			
-			PdfPTable table = new PdfPTable(4);
+			PdfPTable table = new PdfPTable(10);
 			table.setWidthPercentage(100);
 			table.setSpacingBefore(10f);
 			table.setSpacingAfter(10);
@@ -231,7 +234,7 @@ public class ProduitServiceImpl implements ProduitService {
 			designation.setBackgroundColor(BaseColor.GRAY);
 			designation.setExtraParagraphSpace(5f);
 			table.addCell(designation);
-
+        /*
 			PdfPCell scategorie = new PdfPCell(new Paragraph("Scategorie", tableHeader));
 			scategorie.setBorderColor(BaseColor.BLACK);
 			scategorie.setPaddingLeft(10);
@@ -250,39 +253,83 @@ public class ProduitServiceImpl implements ProduitService {
 			categorie.setBackgroundColor(BaseColor.GRAY);
 			categorie.setExtraParagraphSpace(5f);
 			table.addCell(categorie);
-			
-			/*
-			 * PdfPCell prixAchat = new PdfPCell(new Paragraph("P.Achat", tableHeader));
-			 * prixAchat.setBorderColor(BaseColor.BLACK); prixAchat.setPaddingLeft(10);
-			 * prixAchat.setHorizontalAlignment(Element.ALIGN_CENTER);
-			 * prixAchat.setVerticalAlignment(Element.ALIGN_CENTER);
-			 * prixAchat.setBackgroundColor(BaseColor.GRAY);
-			 * prixAchat.setExtraParagraphSpace(5f); table.addCell(prixAchat);
-			 * 
-			 * PdfPCell prixVente = new PdfPCell(new Paragraph("P.Unitaire", tableHeader));
-			 * prixVente.setBorderColor(BaseColor.BLACK); prixVente.setPaddingLeft(10);
-			 * prixVente.setHorizontalAlignment(Element.ALIGN_CENTER);
-			 * prixVente.setVerticalAlignment(Element.ALIGN_CENTER);
-			 * prixVente.setBackgroundColor(BaseColor.GRAY);
-			 * prixVente.setExtraParagraphSpace(5f); table.addCell(prixVente);
-			 * 
-			 * PdfPCell stockInitial = new PdfPCell(new Paragraph("Stock", tableHeader));
-			 * stockInitial.setBorderColor(BaseColor.BLACK);
-			 * stockInitial.setPaddingLeft(10);
-			 * stockInitial.setHorizontalAlignment(Element.ALIGN_CENTER);
-			 * stockInitial.setVerticalAlignment(Element.ALIGN_CENTER);
-			 * stockInitial.setBackgroundColor(BaseColor.GRAY);
-			 * stockInitial.setExtraParagraphSpace(5f); table.addCell(stockInitial);
-			 * 
-			 * PdfPCell add_date = new PdfPCell(new Paragraph("Date Ajout", tableHeader));
-			 * add_date.setBorderColor(BaseColor.BLACK); add_date.setPaddingLeft(10);
-			 * add_date.setHorizontalAlignment(Element.ALIGN_CENTER);
-			 * add_date.setVerticalAlignment(Element.ALIGN_CENTER);
-			 * add_date.setBackgroundColor(BaseColor.GRAY);
-			 * add_date.setExtraParagraphSpace(5f); table.addCell(add_date);
-			 */
-			
-			for (Produit prod: produits) {
+			*/
+
+			PdfPCell prixAchat = new PdfPCell(new Paragraph("P.Achat", tableHeader));
+			prixAchat.setBorderColor(BaseColor.BLACK);
+			prixAchat.setPaddingLeft(10);
+			prixAchat.setHorizontalAlignment(Element.ALIGN_CENTER);
+			prixAchat.setVerticalAlignment(Element.ALIGN_CENTER);
+			prixAchat.setBackgroundColor(BaseColor.GRAY);
+			prixAchat.setExtraParagraphSpace(5f);
+			table.addCell(prixAchat);
+
+
+			PdfPCell prixVente = new PdfPCell(new Paragraph("P.Vente", tableHeader));
+			prixVente.setBorderColor(BaseColor.BLACK);
+			prixVente.setPaddingLeft(10);
+			prixVente.setHorizontalAlignment(Element.ALIGN_CENTER);
+			prixVente.setVerticalAlignment(Element.ALIGN_CENTER);
+			prixVente.setBackgroundColor(BaseColor.GRAY);
+			prixVente.setExtraParagraphSpace(5f);
+			table.addCell(prixVente);
+
+			PdfPCell prixDetail = new PdfPCell(new Paragraph("P.Detail", tableHeader));
+			prixDetail.setBorderColor(BaseColor.BLACK);
+			prixDetail.setPaddingLeft(10);
+			prixDetail.setHorizontalAlignment(Element.ALIGN_CENTER);
+			prixDetail.setVerticalAlignment(Element.ALIGN_CENTER);
+			prixDetail.setBackgroundColor(BaseColor.GRAY);
+			prixDetail.setExtraParagraphSpace(5f);
+			table.addCell(prixDetail);
+
+			PdfPCell stock = new PdfPCell(new Paragraph("Stock", tableHeader));
+			stock.setBorderColor(BaseColor.BLACK);
+			stock.setPaddingLeft(10);
+			stock.setHorizontalAlignment(Element.ALIGN_CENTER);
+			stock.setVerticalAlignment(Element.ALIGN_CENTER);
+			stock.setBackgroundColor(BaseColor.GRAY);
+			stock.setExtraParagraphSpace(5f);
+			table.addCell(stock);
+
+
+			PdfPCell stockInitial = new PdfPCell(new Paragraph("StockInitial", tableHeader));
+            stockInitial.setBorderColor(BaseColor.BLACK);
+            stockInitial.setPaddingLeft(10);
+            stockInitial.setHorizontalAlignment(Element.ALIGN_CENTER);
+            stockInitial.setVerticalAlignment(Element.ALIGN_CENTER);
+            stockInitial.setBackgroundColor(BaseColor.GRAY);
+            stockInitial.setExtraParagraphSpace(5f);
+            table.addCell(stockInitial);
+
+            PdfPCell add_date = new PdfPCell(new Paragraph("Date Ajout", tableHeader));
+            add_date.setBorderColor(BaseColor.BLACK);
+            add_date.setPaddingLeft(10);
+            add_date.setHorizontalAlignment(Element.ALIGN_CENTER);
+            add_date.setVerticalAlignment(Element.ALIGN_CENTER);
+            add_date.setBackgroundColor(BaseColor.GRAY);
+            add_date.setExtraParagraphSpace(5f);
+            table.addCell(add_date);
+
+			PdfPCell scategorie = new PdfPCell(new Paragraph("Scategorie", tableHeader));
+			scategorie.setBorderColor(BaseColor.BLACK);
+			scategorie.setPaddingLeft(10);
+			scategorie.setHorizontalAlignment(Element.ALIGN_CENTER);
+			scategorie.setVerticalAlignment(Element.ALIGN_CENTER);
+			scategorie.setBackgroundColor(BaseColor.GRAY);
+			scategorie.setExtraParagraphSpace(5f);
+			table.addCell(scategorie);
+
+			PdfPCell categorie = new PdfPCell(new Paragraph("Categorie", tableHeader));
+			categorie.setBorderColor(BaseColor.BLACK);
+			categorie.setPaddingLeft(10);
+			categorie.setHorizontalAlignment(Element.ALIGN_CENTER);
+			categorie.setVerticalAlignment(Element.ALIGN_CENTER);
+			categorie.setBackgroundColor(BaseColor.GRAY);
+			categorie.setExtraParagraphSpace(5f);
+			table.addCell(categorie);
+
+            for (Produit prod: produits) {
 				PdfPCell referenceValue = new PdfPCell(new Paragraph(prod.getReference(), tableBody));
 				referenceValue.setBorderColor(BaseColor.BLACK);
 				referenceValue.setPaddingLeft(10);
@@ -301,6 +348,60 @@ public class ProduitServiceImpl implements ProduitService {
 				designationValue.setExtraParagraphSpace(5f);
 				table.addCell(designationValue);
 				
+				PdfPCell prixAchatValue = new PdfPCell(new Paragraph(prod.getPrixAchat().toString(), tableBody));
+                prixAchatValue.setBorderColor(BaseColor.BLACK);
+                prixAchatValue.setPaddingLeft(10);
+                prixAchatValue.setHorizontalAlignment(Element.ALIGN_CENTER);
+                prixAchatValue.setVerticalAlignment(Element.ALIGN_CENTER);
+                prixAchatValue.setBackgroundColor(BaseColor.WHITE);
+                prixAchatValue.setExtraParagraphSpace(5f);
+				table.addCell(prixAchatValue);
+
+				PdfPCell prixVenteValue = new PdfPCell(new Paragraph(prod.getPrixVente().toString(), tableBody));
+				prixVenteValue.setBorderColor(BaseColor.BLACK);
+				prixVenteValue.setPaddingLeft(10);
+				prixVenteValue.setHorizontalAlignment(Element.ALIGN_CENTER);
+				prixVenteValue.setVerticalAlignment(Element.ALIGN_CENTER);
+				prixVenteValue.setBackgroundColor(BaseColor.WHITE);
+				prixVenteValue.setExtraParagraphSpace(5f);
+				table.addCell(prixVenteValue);
+
+				PdfPCell prixDetailValue = new PdfPCell(new Paragraph(prod.getPrixDetail().toString(), tableBody));
+				prixDetailValue.setBorderColor(BaseColor.BLACK);
+				prixDetailValue.setPaddingLeft(10);
+				prixDetailValue.setHorizontalAlignment(Element.ALIGN_CENTER);
+				prixDetailValue.setVerticalAlignment(Element.ALIGN_CENTER);
+				prixDetailValue.setBackgroundColor(BaseColor.WHITE);
+				prixDetailValue.setExtraParagraphSpace(5f);
+				table.addCell(prixDetailValue);
+
+				PdfPCell stockValue = new PdfPCell(new Paragraph(String.valueOf(prod.getQtestock()), tableBody));
+				stockValue.setBorderColor(BaseColor.BLACK);
+				stockValue.setPaddingLeft(10);
+				stockValue.setHorizontalAlignment(Element.ALIGN_CENTER);
+				stockValue.setVerticalAlignment(Element.ALIGN_CENTER);
+				stockValue.setBackgroundColor(BaseColor.WHITE);
+				stockValue.setExtraParagraphSpace(5f);
+				table.addCell(stockValue);
+
+				PdfPCell stockInitValue = new PdfPCell(new Paragraph(String.valueOf(prod.getStockInitial()), tableBody));
+				stockInitValue.setBorderColor(BaseColor.BLACK);
+				stockInitValue.setPaddingLeft(10);
+				stockInitValue.setHorizontalAlignment(Element.ALIGN_CENTER);
+				stockInitValue.setVerticalAlignment(Element.ALIGN_CENTER);
+				stockInitValue.setBackgroundColor(BaseColor.WHITE);
+				stockInitValue.setExtraParagraphSpace(5f);
+				table.addCell(stockInitValue);
+
+                PdfPCell addDateValue = new PdfPCell(new Paragraph(prod.getAdd_date().toString(), tableBody));
+                addDateValue.setBorderColor(BaseColor.BLACK);
+                addDateValue.setPaddingLeft(10);
+                addDateValue.setHorizontalAlignment(Element.ALIGN_CENTER);
+                addDateValue.setVerticalAlignment(Element.ALIGN_CENTER);
+                addDateValue.setBackgroundColor(BaseColor.WHITE);
+                addDateValue.setExtraParagraphSpace(5f);
+                table.addCell(addDateValue);
+
 				PdfPCell scategorieValue = new PdfPCell(new Paragraph(prod.getScategorie().getLibelle(), tableBody));
 				scategorieValue.setBorderColor(BaseColor.BLACK);
 				scategorieValue.setPaddingLeft(10);
@@ -318,45 +419,7 @@ public class ProduitServiceImpl implements ProduitService {
 				categorieValue.setBackgroundColor(BaseColor.WHITE);
 				categorieValue.setExtraParagraphSpace(5f);
 				table.addCell(categorieValue);
-				
-				/*
-				 * PdfPCell prixAchatValue = new PdfPCell(new Paragraph(prod.getPrixAchat(),
-				 * tableBody)); prixAchatValue.setBorderColor(BaseColor.BLACK);
-				 * prixAchatValue.setPaddingLeft(10);
-				 * prixAchatValue.setHorizontalAlignment(Element.ALIGN_CENTER);
-				 * prixAchatValue.setVerticalAlignment(Element.ALIGN_CENTER);
-				 * prixAchatValue.setBackgroundColor(BaseColor.WHITE);
-				 * prixAchatValue.setExtraParagraphSpace(5f); table.addCell(prixAchatValue);
-				 */
-				
-				/*
-				 * PdfPCell prixVenteValue = new PdfPCell(new Paragraph((prod.getPrixVente()),
-				 * tableBody)); prixVenteValue.setBorderColor(BaseColor.BLACK);
-				 * prixVenteValue.setPaddingLeft(10);
-				 * prixVenteValue.setHorizontalAlignment(Element.ALIGN_CENTER);
-				 * prixVenteValue.setVerticalAlignment(Element.ALIGN_CENTER);
-				 * prixVenteValue.setBackgroundColor(BaseColor.WHITE);
-				 * prixVenteValue.setExtraParagraphSpace(5f); table.addCell(prixVenteValue);
-				 * 
-				 * PdfPCell stockInitialValue = new PdfPCell(new
-				 * Paragraph(prod.getStockInitial(), tableBody));
-				 * stockInitialValue.setBorderColor(BaseColor.BLACK);
-				 * stockInitialValue.setPaddingLeft(10);
-				 * stockInitialValue.setHorizontalAlignment(Element.ALIGN_CENTER);
-				 * stockInitialValue.setVerticalAlignment(Element.ALIGN_CENTER);
-				 * stockInitialValue.setBackgroundColor(BaseColor.WHITE);
-				 * stockInitialValue.setExtraParagraphSpace(5f);
-				 * table.addCell(stockInitialValue);
-				 * 
-				 * PdfPCell addDateValue = new PdfPCell(new Paragraph(prod.getAdd_date(),
-				 * tableBody)); addDateValue.setBorderColor(BaseColor.BLACK);
-				 * addDateValue.setPaddingLeft(10);
-				 * addDateValue.setHorizontalAlignment(Element.ALIGN_CENTER);
-				 * addDateValue.setVerticalAlignment(Element.ALIGN_CENTER);
-				 * addDateValue.setBackgroundColor(BaseColor.WHITE);
-				 * addDateValue.setExtraParagraphSpace(5f); table.addCell(addDateValue);
-				 */
-				
+
 			}
 			
 			document.add(table);
@@ -380,7 +443,7 @@ public class ProduitServiceImpl implements ProduitService {
 			new File(filePath).mkdirs();
 		}
 		try {
-			FileOutputStream outputStream = new FileOutputStream(file+"/"+"articles"+".xls");
+			FileOutputStream outputStream = new FileOutputStream(file+"/"+"articles"+".xlsx");
 			HSSFWorkbook workbook = new HSSFWorkbook();
 			HSSFSheet workSheet = workbook.createSheet("Articles");
 			workSheet.setDefaultColumnWidth(30);
@@ -398,7 +461,8 @@ public class ProduitServiceImpl implements ProduitService {
 			HSSFCell designation = headerRow.createCell(1);
 			designation.setCellValue("Designation");
 			designation.setCellStyle(headerCellStyle);
-			
+
+			/*
 			HSSFCell scategorie = headerRow.createCell(2);
 			scategorie.setCellValue("Scategorie");
 			scategorie.setCellStyle(headerCellStyle);
@@ -406,7 +470,8 @@ public class ProduitServiceImpl implements ProduitService {
 			HSSFCell categorie = headerRow.createCell(3);
 			categorie.setCellValue("Categorie");
 			categorie.setCellStyle(headerCellStyle);
-			
+
+			*/
 			int i = 1;
 			for (Produit prod: produitList) {
 				HSSFRow bodyRow = workSheet.createRow(i);
@@ -421,7 +486,7 @@ public class ProduitServiceImpl implements ProduitService {
 				HSSFCell designationValue = bodyRow.createCell(1);
 				designationValue.setCellValue(prod.getDesignation());
 				designationValue.setCellStyle(bodyCellStyle);
-				
+				/*
 				HSSFCell scategorieValue = bodyRow.createCell(2);
 				scategorieValue.setCellValue(prod.getScategorie().getLibelle());
 				scategorieValue.setCellStyle(bodyCellStyle);
@@ -429,7 +494,8 @@ public class ProduitServiceImpl implements ProduitService {
 				HSSFCell categorieValue = bodyRow.createCell(3);
 				categorieValue.setCellValue(prod.getCategorie().getDesignation());
 				categorieValue.setCellStyle(bodyCellStyle);
-				
+
+				*/
 				i++;
 				
 			}
@@ -452,6 +518,7 @@ public class ProduitServiceImpl implements ProduitService {
         return null;
    
 	}
-	
-	
+
+
+
 }

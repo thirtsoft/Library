@@ -29,8 +29,9 @@ public interface CommandeClientRepository extends JpaRepository<CommandeClient, 
 	
 	@Query("select c from CommandeClient c where c.status like :status") 
 	public List<CommandeClient> ListCommandeClientByStatus(@Param("status") String status);
-	
-	
+
+	public List<CommandeClient> findAllByDateCommande(Date dateCommande);
+
 	@Query("select p from CommandeClient p where p.client.id =:id")
 	public Page<CommandeClient> findCommandeClientByClientId(@Param("id") Long clientId, Pageable pageable);
 	

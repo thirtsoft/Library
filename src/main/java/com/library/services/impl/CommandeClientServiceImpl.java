@@ -6,8 +6,10 @@ import java.util.Optional;
 
 import javax.transaction.Transactional;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.library.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.json.JsonParseException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -32,19 +34,11 @@ public class CommandeClientServiceImpl implements CommandeClientService {
     private CommandeClientRepository commandeClientRepository;
 
     @Autowired
-    private LigneCmdClientRepository ligneCmdClientRepository;
-
-    @Autowired
     private LigneCmdClientService ligneCmdClientService;
-
-    @Autowired
-    private ProduitRepository produitRepository;
 
     @Autowired
     private ProduitService produitService;
 
-    @Autowired
-    private ClientRepository clientRepository;
 
     @Override
     public List<CommandeClient> findAllCommandeClient() {
@@ -62,24 +56,10 @@ public class CommandeClientServiceImpl implements CommandeClientService {
 
     @Override
     public CommandeClient createCommande(CommandeClient commandeClient) {
-//		CommandeForm orderForm = new CommandeForm();
-//		Client client = new Client();
-//		client.setRaisonSocial(orderForm.getClient().getRaisonSocial());
-//		client.setChefService(orderForm.getClient().getChefService());
-//		client.setAdresse(orderForm.getClient().getAdresse());
-//		client.setTelephone(orderForm.getClient().getTelephone());
-//		client.setEmail(orderForm.getClient().getEmail());
-
-//		client = clientRepository.save(client);
-//
-//		System.out.println(client.getId());
-//
-//		commandeClient.setClient(client);
-
-//		commandeClientRepository.save(commandeClient);
 
         List<LigneCmdClient> lcmdClient = commandeClient.getLigneCmdClients();
-        ligneCmdClientRepository.saveAll(lcmdClient);
+        ligneCmdClientService.saveListLigneCmd(lcmdClient);
+       // ligneCmdClientRepository.saveAll(lcmdClient);
 
 //        CommandeClient saveCom = commandeClientRepository.save(commandeClient);
 
@@ -91,7 +71,8 @@ public class CommandeClientServiceImpl implements CommandeClientService {
             Produit produit = produitService.findProduitById(lcdClient.getProduit().getId()).get();
             lcdClient.setProduit(produit);
 //			lcdClient.setPrix(produit.getPrixVente());
-            ligneCmdClientRepository.save(lcdClient);
+            ligneCmdClientService.saveLigneCmdClient(lcdClient);
+           // ligneCmdClientRepository.save(lcdClient);
 
             total += lcdClient.getQuantite() * lcdClient.getProduit().getPrixVente();
         }
@@ -117,13 +98,24 @@ public class CommandeClientServiceImpl implements CommandeClientService {
 
             double total = 0;
             for (LigneCmdClient lcmdClt : ligneCmdClients) {
-                    lcmdClt.setCommande(commande);
-                //    Produit produit = produitService.findProduitById(lcmdClt.getProduit().getId()).get();
-                //    lcmdClt.setProduit(produit);
-                lcmdClt.setPrix(lcmdClt.getProduit().getPrixVente());
-                ligneCmdClientRepository.save(lcmdClt);
+                lcmdClt.setCommande(commande);
+                lcmdClt.setNumero(commande.getNumCommande());
 
-                total += lcmdClt.getQuantite() * lcmdClt.getProduit().getPrixVente();
+                ligneCmdClientService.saveLigneCmdClient(lcmdClt);
+
+               Produit produit = produitService.findProduitById(lcmdClt.getProduit().getId()).get();
+               if (produit != null) {
+                   produit.setQtestock(produit.getQtestock() - lcmdClt.getQuantite());
+                   produitService.saveProduit(produit);
+               }
+
+               lcmdClt.setPrix(produit.getPrixVente());
+
+               System.out.println(produit.getPrixVente());
+               System.out.println(lcmdClt.getQuantite());
+                System.out.println(lcmdClt.getQuantite() * produit.getPrixVente());
+
+                total += (lcmdClt.getQuantite() * produit.getPrixVente());
 
             }
 
@@ -136,7 +128,7 @@ public class CommandeClientServiceImpl implements CommandeClientService {
         return commandeClientRepository.save(commande);
 
     }
-
+    /*
     @Override
     public CommandeClient saveCommandeCliente(CommandeClient commande) {
         CommandeForm orderForm = new CommandeForm();
@@ -175,6 +167,8 @@ public class CommandeClientServiceImpl implements CommandeClientService {
 
         return commandeClientRepository.save(commande);
     }
+
+    */
 
     @Override
     public CommandeClient updateCommandeClient(Long comId, CommandeClient commande) {
@@ -239,6 +233,11 @@ public class CommandeClientServiceImpl implements CommandeClientService {
     @Override
     public List<CommandeClient> findCommandeClientByClientId(Long clientId) {
         return commandeClientRepository.ListCommandeClientByClientId(clientId);
+    }
+
+    @Override
+    public List<CommandeClient> findCommandeByDate(Date dateCommande) {
+        return commandeClientRepository.findAllByDateCommande(dateCommande);
     }
 
     @Override

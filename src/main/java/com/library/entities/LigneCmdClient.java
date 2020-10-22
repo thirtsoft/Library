@@ -15,17 +15,16 @@ import javax.persistence.Table;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 @Entity
 @Table(name = "ligneCmdClient")
-@Data
+/*@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
+@ToString*/
 public class LigneCmdClient implements Serializable {
 	/**
 	 * 
@@ -37,27 +36,79 @@ public class LigneCmdClient implements Serializable {
 	private String numero;
 	private int quantite;
 	private double prix;
-	
-	@ManyToOne
-<<<<<<< HEAD
-	@JoinColumn(name="cmdClient_id", nullable = false)
-	private CommandeClient commande;
-		
-	@ManyToOne
-	@JoinColumn(name="prod_id", nullable = false)
-=======
+
+	@ManyToOne (fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@JsonBackReference
 	@JoinColumn(name="cmdClient_id")
-	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+	//@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	private CommandeClient commande;
 		
 	@ManyToOne
 	@JoinColumn(name="prod_id")
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
->>>>>>> 962d992518874a2014c813f38e02d77021502842
+    //@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	private Produit produit;
 
+	public LigneCmdClient() {
+		super();
+	}
 
-	
-	
+	public LigneCmdClient(Long id, String numero, int quantite, double prix, CommandeClient commande, Produit produit) {
+		this.id = id;
+		this.numero = numero;
+		this.quantite = quantite;
+		this.prix = prix;
+		this.commande = commande;
+		this.produit = produit;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getNumero() {
+		return numero;
+	}
+
+	public void setNumero(String numero) {
+		this.numero = numero;
+	}
+
+	public int getQuantite() {
+		return quantite;
+	}
+
+	public void setQuantite(int quantite) {
+		this.quantite = quantite;
+	}
+
+	public double getPrix() {
+		return prix;
+	}
+
+	public void setPrix(double prix) {
+		this.prix = prix;
+	}
+
+	public CommandeClient getCommande() {
+		return commande;
+	}
+
+	public void setCommande(CommandeClient commande) {
+		this.commande = commande;
+	}
+
+	public Produit getProduit() {
+		return produit;
+	}
+
+	public void setProduit(Produit produit) {
+		this.produit = produit;
+	}
+
+
 }
 

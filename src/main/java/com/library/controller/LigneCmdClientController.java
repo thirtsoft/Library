@@ -22,6 +22,8 @@ import com.library.entities.LigneCmdClient;
 import com.library.exceptions.ResourceNotFoundException;
 import com.library.services.LigneCmdClientService;
 
+import javax.validation.Valid;
+
 @RestController
 @CrossOrigin
 @RequestMapping("/alAmine")
@@ -57,11 +59,12 @@ public class LigneCmdClientController {
 		return ligneCmdClientService.findAllLigneCmdClientByProduit(prodId, PageRequest.of(page, size));
 	}
 	
-	@GetMapping("/searchListLigneCmdClientByCommandeId")
-	public List<LigneCmdClient> getAllLigneCmdClientByCommandeId(@RequestParam("comId") Long comId) {
+	@GetMapping("/searchListLigneCmdClientByCommandeId/{comId}")
+	public List<LigneCmdClient> getAllLigneCmdClientByCommandeId(@PathVariable("comId") Long comId) {
 		return ligneCmdClientService.findLigneCmdClientByCommandeClientId(comId);
 	}
-	
+
+
 	@GetMapping("/searchListLigneCmdClientByCommandePageable")
 	public Page<LigneCmdClient> getAllCommandeByPageable(@RequestParam(name = "prod")Long comId,
 			@RequestParam(name = "page") int page,
@@ -70,7 +73,7 @@ public class LigneCmdClientController {
 	}
 	
 	@PostMapping("/ligneCommandes") 
-	public LigneCmdClient createLigneCmdClient(@RequestBody LigneCmdClient ligneCmdClient) {
+	public LigneCmdClient createLigneCmdClient(@Valid @RequestBody LigneCmdClient ligneCmdClient) {
 		return ligneCmdClientService.saveLigneCmdClient(ligneCmdClient);	
 	}
 	

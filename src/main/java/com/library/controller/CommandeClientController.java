@@ -3,9 +3,12 @@ package com.library.controller;
 import java.util.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.json.JsonParseException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -27,6 +30,8 @@ import com.library.repository.LigneCmdClientRepository;
 import com.library.services.ClientService;
 import com.library.services.CommandeClientService;
 import com.library.services.LigneCmdClientService;
+
+import javax.validation.Valid;
 
 @RestController
 @CrossOrigin
@@ -89,6 +94,12 @@ public class CommandeClientController {
 	public List<CommandeClient> getAllCommandeClientByClientId(@RequestParam("clientId") Long clientId) {
 		return commandeClientService.findCommandeClientByClientId(clientId);
 	}
+
+	@GetMapping("/getAllCommandewithdate")
+	public List<CommandeClient> getAllCommandesWithDatet(@RequestParam("date") @DateTimeFormat(pattern="yyyy-MM-dd") Date dateCommande){
+
+		return commandeClientService.findCommandeByDate(dateCommande);
+	}
 	
 	@GetMapping("/searchListCommandeClientByPageable")
 	public Page<CommandeClient> getCommandeClientByPageable(
@@ -131,28 +142,7 @@ public class CommandeClientController {
 		return new ResponseEntity<>(HttpStatus.OK);
 		
 	}
-	
-<<<<<<< HEAD
-	@PostMapping("/comms")
-	public ResponseEntity<CommandeClient> enregistrerCommande(@RequestBody CommandeClient commandeClient) {
-		commandeClientRepository.save(commandeClient);
-		
-		List<LigneCmdClient> lcomms = commandeClient.getLigneCmdClients();
-		for (LigneCmdClient lc : lcomms) {
-			lc.setNumero(commandeClient.getNumCommande());
-			ligneCmdClientRepository.save(lc);
-			
-		}
-		
-		return new ResponseEntity<>(HttpStatus.OK);
-		
-	}
-	
-	@PostMapping("/commandes") 
-	public ResponseEntity<CommandeClient> createCommande(@RequestBody CommandeClient commandeClient) {
-	    
-		commandeClientService.createCommande(commandeClient);
-=======
+
 	@PostMapping("/commandes")
 	public ResponseEntity<CommandeClient> createCommande(@RequestBody CommandeClient commandeClient) {
 	    
@@ -164,32 +154,12 @@ public class CommandeClientController {
 //			ligneCmdClientService.saveLigneCmdClient(lc);
 //
 //		}
->>>>>>> 962d992518874a2014c813f38e02d77021502842
-		
 		return new ResponseEntity<>(HttpStatus.OK);
-		
 	}
 	
-	@PostMapping("/commandesClientes") 
-<<<<<<< HEAD
-	public CommandeClient createCommandeClient(@RequestBody CommandeClient commandeClient) {
-		/*
-		 * commandeClientService.saveCommandeCliente(commandeClient);
-		 * List<LigneCmdClient> lcomms = commandeClient.getLigneCmdClients(); for
-		 * (LigneCmdClient lc : lcomms) { lc.setNumero(commandeClient.getNumCommande());
-		 * ligneCmdClientService.saveLigneCmdClient(lc); }
-		 * commandeClient.setNumCommande("Cmd "+15+(int)(Math.random()*100));
-		 * commandeClient.setStatus("valider"); commandeClient.setDateCommande(new
-		 * Date());
-		 */
-	    
-		return commandeClientService.saveCommandeCliente(commandeClient);
-=======
-	public CommandeClient createCommandeClient(@RequestBody CommandeClient commandeClient) throws Exception  {
-
-		return commandeClientService.saveCommandeClient(commandeClient);
->>>>>>> 962d992518874a2014c813f38e02d77021502842
-		
+	@PostMapping("/commandesClientes")
+	public ResponseEntity<CommandeClient> createCommandeClient(@RequestBody @Valid CommandeClient commandeClient) throws JsonParseException, JsonMappingException, Exception  {
+		return new ResponseEntity<>(commandeClientService.saveCommandeClient(commandeClient), HttpStatus.OK);
 	}
 	
 	@PutMapping("/commandes/{id}")

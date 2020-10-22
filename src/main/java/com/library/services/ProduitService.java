@@ -1,5 +1,7 @@
 package com.library.services;
 
+import java.io.ByteArrayInputStream;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,7 +19,7 @@ import com.library.entities.Produit;
 public interface ProduitService {
 	
 	public Optional<Produit> findProduitById(Long prodId);
-	public Produit saveProduit(Long catId, Produit produit);
+	//public Produit saveProduit(Long catId, Produit produit);
 	public Produit saveProduit(Produit produit);
 	
 	public Produit updateProduit(Long prodId, Produit produit);
@@ -32,8 +34,9 @@ public interface ProduitService {
 	public List<Produit> findListProduitByDesignation(String designation);
 	public List<Produit> findProductByCateoryId(Long catId);
 	public List<Produit> findProductByScateoryId(Long scatId);
-	
-	
+	public List<Produit> findListProduitByAddDate(Date add_date);
+
+
 	public Page<Produit> findAllProduitsByPageable(Pageable page);
 	public Page<Produit>findAllProduitsByCategory(Long catId, Pageable pageable);
 	
@@ -44,5 +47,6 @@ public interface ProduitService {
 	boolean createExcel(List<Produit> produits, ServletContext context, HttpServletRequest request, HttpServletResponse response);
 	
 	public ResponseEntity<List<Produit>> importExcelFile(MultipartFile files);
+
 
 }
